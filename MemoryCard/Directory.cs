@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 namespace GC_MemoryCard_Reader.MemoryCard
 {
     /// <summary>
+    /// This enumeration helps us track the different kinds of <see cref="Directory"/> types we can work with.
+    /// To make the usage of the enumeration easy, we'll assign the offset value to each type.
+    /// That way we can simply cast the value to its numeric representation and rely on the data.
+    /// </summary>
+    public enum DirectoryType { Standard = 0x2000, Backup = 0x4000 }
+
+    /// <summary>
     /// This class represents a single Directory on the Nintendo GameCube MemoryCard.
     /// The directory can be a backup, but this does not affect the structure of the Directory.
     /// 

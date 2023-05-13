@@ -28,7 +28,7 @@ namespace GC_MemoryCard_Reader
             {
                 Header = parser.ExtractHeader(),
                 Directory = parser.ExtractDirectory(),
-                DirectoryBackup = parser.ExtractDirectory(true)
+                DirectoryBackup = parser.ExtractDirectory(MemoryCard.DirectoryType.Backup)
             };
         }
 

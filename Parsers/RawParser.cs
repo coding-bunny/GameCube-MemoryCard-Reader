@@ -55,10 +55,8 @@ namespace GC_MemoryCard_Reader.Parsers
             }
         }
 
-        public MemoryCard.Directory ExtractDirectory(bool backup = false)
+        public MemoryCard.Directory ExtractDirectory(MemoryCard.DirectoryType type = MemoryCard.DirectoryType.Standard)
         {
-            var offset = backup ? 0x4000 : 0x2000;
-
             // Open the file, and read the first 0x2000 bytes, which is the header we care about.
             using (var stream = File.Open(_path, FileMode.Open))
             {
@@ -66,7 +64,7 @@ namespace GC_MemoryCard_Reader.Parsers
                 {
                     // Move the underlying stream to the correct position and read out the desired block of the Directory.
                     // We know the Directory block is 0x2000 bytes long, regardless if it's the backup or not.
-                    reader.BaseStream.Seek(offset, SeekOrigin.Begin);
+                    reader.BaseStream.Seek((long)type, SeekOrigin.Begin);
                     byte[] directoryRaw = reader.ReadBytes(0x2000);
                     var directory = new MemoryCard.Directory();
 
@@ -78,24 +76,24 @@ namespace GC_MemoryCard_Reader.Parsers
                         uint gameCode = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x00, 0x04));
 
                         if (gameCode == uint.MaxValue)
-                            i = 128;
-                        else
-                            directory.Entries.Add(new MemoryCard.DirectoryEntry()
-                            {
-                                GameCode = gameCode,
-                                MakerCode = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x04, 0x02)),
-                                Banner = directoryRaw.AsSpan<byte>(entryOffset + 0x07, 0x01)[0],
-                                FileName = Encoding.ASCII.GetString(directoryRaw.AsSpan<byte>(entryOffset + 0x08, 0x020)),
-                                LastModification = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x28, 0x04)),
-                                ImageDataOffset = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x2C, 0x04)),
-                                IconFormat = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x30, 0x02)),
-                                AnimationSpeed = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x32, 0x02)),
-                                FilePermissions = directoryRaw.AsSpan<byte>(entryOffset + 0x34, 0x01)[0],
-                                CopyCounter = directoryRaw.AsSpan<byte>(entryOffset + 0x35, 0x01)[0],
-                                BlockNumber = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x36, 0x02)),
-                                BlockCount = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x38, 0x02)),
-                                CommentAddress = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x3c, 0x04)),
-                            }) ;
+                            break;
+
+                        directory.Entries.Add(new MemoryCard.DirectoryEntry()
+                        {
+                            GameCode = gameCode,
+                            MakerCode = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x04, 0x02)),
+                            Banner = directoryRaw.AsSpan<byte>(entryOffset + 0x07, 0x01)[0],
+                            FileName = Encoding.ASCII.GetString(directoryRaw.AsSpan<byte>(entryOffset + 0x08, 0x020)),
+                            LastModification = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x28, 0x04)),
+                            ImageDataOffset = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x2C, 0x04)),
+                            IconFormat = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x30, 0x02)),
+                            AnimationSpeed = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x32, 0x02)),
+                            FilePermissions = directoryRaw.AsSpan<byte>(entryOffset + 0x34, 0x01)[0],
+                            CopyCounter = directoryRaw.AsSpan<byte>(entryOffset + 0x35, 0x01)[0],
+                            BlockNumber = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x36, 0x02)),
+                            BlockCount = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x38, 0x02)),
+                            CommentAddress = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x3c, 0x04)),
+                        });
                     }                    
 
                     return directory;
