@@ -15,7 +15,7 @@ namespace GC_MemoryCard_Reader.MemoryCard
     {
         public uint GameCode { get; internal set; }
         public ushort MakerCode { get; internal set; }
-        public byte Banner {  get; internal set; }
+        public BannerGfxFormat Banner {  get; internal set; }
         public string FileName { get; internal set; } = "";
         public uint LastModification { get; internal set; }
         public uint ImageDataOffset { get;internal set; }
@@ -33,7 +33,7 @@ namespace GC_MemoryCard_Reader.MemoryCard
 
             sb.AppendLine($"\tGameCode: {GameCode}");
             sb.AppendLine($"\tMakerCode: {MakerCode}");
-            sb.AppendLine($"\tBanner: {Convert.ToString(Banner).PadLeft(8, '0')}");
+            sb.AppendLine($"\tBanner: {Banner.ToString()}");
             sb.AppendLine($"\tFileName: {FileName}");
             sb.AppendLine($"\tLastModification: {LastModification}");
             sb.AppendLine($"\tImageDataOffset: {ImageDataOffset}");

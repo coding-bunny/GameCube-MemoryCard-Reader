@@ -4,6 +4,7 @@ using System.Linq;
 using System.Buffers.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using GC_MemoryCard_Reader.MemoryCard;
 
 namespace GC_MemoryCard_Reader.Parsers
 {
@@ -82,7 +83,7 @@ namespace GC_MemoryCard_Reader.Parsers
                         {
                             GameCode = gameCode,
                             MakerCode = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x04, 0x02)),
-                            Banner = directoryRaw.AsSpan<byte>(entryOffset + 0x07, 0x01)[0],
+                            Banner = (BannerGfxFormat)directoryRaw.AsSpan<byte>(entryOffset + 0x07, 0x01)[0],
                             FileName = Encoding.ASCII.GetString(directoryRaw.AsSpan<byte>(entryOffset + 0x08, 0x020)),
                             LastModification = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x28, 0x04)),
                             ImageDataOffset = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x2C, 0x04)),
