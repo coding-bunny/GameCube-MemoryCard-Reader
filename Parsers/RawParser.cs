@@ -49,7 +49,7 @@ namespace GC_MemoryCard_Reader.Parsers
 
                     return new MemoryCard.Header()
                     {
-                        TimeSpan = BinaryPrimitives.ReadUInt64BigEndian(headerRaw.AsSpan<byte>(0x000C, 0x08)),
+                        TimeSpan = BinaryPrimitives.ReadInt64BigEndian(headerRaw.AsSpan<byte>(0x000C, 0x08)),
                         CardId = Encoding.UTF8.GetString(headerRaw.AsSpan<byte>(0x0014, 6).ToArray()),
                         Size = BinaryPrimitives.ReadInt16BigEndian(headerRaw.AsSpan<byte>(0x0022, 0x02)),
                         Encoding = BinaryPrimitives.ReadInt16BigEndian(headerRaw.AsSpan<byte>(0x0024, 0x02)),

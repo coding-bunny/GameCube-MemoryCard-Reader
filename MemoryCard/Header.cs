@@ -8,7 +8,7 @@ namespace GC_MemoryCard_Reader.MemoryCard
 {
     internal class Header
     {
-        public ulong TimeSpan { get; set; }
+        public long TimeSpan { get; set; }
         public string CardId { get; set; } = "";
         public short Size { get; set; }
         public short Encoding { get; set; }
@@ -41,7 +41,7 @@ namespace GC_MemoryCard_Reader.MemoryCard
         {
             // TODO: Determine the card type somehow.
             // A GameCube has a different CPU count than a Wii for example, resulting in different values.
-            return GameCubeEpoch.AddSeconds((TimeSpan & 0xFFFF0000) / 12);
+            return GameCubeEpoch.AddTicks(TimeSpan);
         }
     }
 }
