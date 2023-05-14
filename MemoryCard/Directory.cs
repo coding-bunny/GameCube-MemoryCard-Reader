@@ -22,9 +22,9 @@ namespace GC_MemoryCard_Reader.MemoryCard
     internal class Directory
     {
         public ICollection<DirectoryEntry> Entries { get; internal set; } = new List<DirectoryEntry>(127);
-        public ushort UpdateCounter { get; internal set; }
-        public ushort ChecksumOne { get; internal set; }
-        public ushort ChecksumTwo { get; internal set; }
+        public short UpdateCounter { get; internal set; }
+        public short ChecksumOne { get; internal set; }
+        public short ChecksumTwo { get; internal set; }
 
         /// <summary>
         /// Returns a <see cref="string"/> representation of the <c>Directory</c>.

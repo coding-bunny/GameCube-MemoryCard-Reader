@@ -16,6 +16,11 @@ namespace GC_MemoryCard_Reader.Parsers
         string _path;
 
         /// <summary>
+        /// This value represents a non-set GameCode.
+        /// </summary>
+        private const short NotSetGameCode = -1; 
+
+        /// <summary>
         /// Creates a new instance of the RawParser and opens a FileStream to the provided path.
         /// </summary>
         /// <param name="path"></param>
@@ -44,13 +49,13 @@ namespace GC_MemoryCard_Reader.Parsers
 
                     return new MemoryCard.Header()
                     {
-                        TimeSpan = BinaryPrimitives.ReadUInt64BigEndian(headerRaw.AsSpan<byte>(0x000C, 8)),
+                        TimeSpan = BinaryPrimitives.ReadUInt64BigEndian(headerRaw.AsSpan<byte>(0x000C, 0x08)),
                         CardId = Encoding.UTF8.GetString(headerRaw.AsSpan<byte>(0x0014, 6).ToArray()),
-                        Size = BinaryPrimitives.ReadUInt16BigEndian(headerRaw.AsSpan<byte>(0x0022, 2)),
-                        Encoding = BinaryPrimitives.ReadUInt16BigEndian(headerRaw.AsSpan<byte>(0x0024, 2)),
-                        UpdateCounter = BinaryPrimitives.ReadUInt16BigEndian(headerRaw.AsSpan<byte>(0x01FA, 2)),
-                        CheckSumOne = BinaryPrimitives.ReadUInt16BigEndian(headerRaw.AsSpan<byte>(0x01FC, 2)),
-                        CheckSumTwo = BinaryPrimitives.ReadUInt16BigEndian(headerRaw.AsSpan<byte>(0x01FE, 2))
+                        Size = BinaryPrimitives.ReadInt16BigEndian(headerRaw.AsSpan<byte>(0x0022, 0x02)),
+                        Encoding = BinaryPrimitives.ReadInt16BigEndian(headerRaw.AsSpan<byte>(0x0024, 0x02)),
+                        UpdateCounter = BinaryPrimitives.ReadInt16BigEndian(headerRaw.AsSpan<byte>(0x01FA, 0x02)),
+                        CheckSumOne = BinaryPrimitives.ReadInt16BigEndian(headerRaw.AsSpan<byte>(0x01FC, 0x02)),
+                        CheckSumTwo = BinaryPrimitives.ReadInt16BigEndian(headerRaw.AsSpan<byte>(0x01FE, 0x02))
                     };
                 }
             }
@@ -74,26 +79,26 @@ namespace GC_MemoryCard_Reader.Parsers
                     {
                         var entryOffset = i * 0x40;
 
-                        uint gameCode = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x00, 0x04));
+                        int gameCode = BinaryPrimitives.ReadInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x00, 0x04));
 
-                        if (gameCode == uint.MaxValue)
+                        if (gameCode == NotSetGameCode)
                             break;
 
                         directory.Entries.Add(new MemoryCard.DirectoryEntry()
                         {
-                            GameCode = gameCode,
-                            MakerCode = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x04, 0x02)),
+                            GameCode = Encoding.ASCII.GetString(directoryRaw.AsSpan<byte>(entryOffset + 0x00, 0x04)),
+                            MakerCode = BinaryPrimitives.ReadInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x04, 0x02)),
                             Banner = (BannerGfxFormat)directoryRaw.AsSpan<byte>(entryOffset + 0x07, 0x01)[0],
                             FileName = Encoding.ASCII.GetString(directoryRaw.AsSpan<byte>(entryOffset + 0x08, 0x020)),
-                            LastModification = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x28, 0x04)),
-                            ImageDataOffset = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x2C, 0x04)),
-                            IconFormat = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x30, 0x02)),
-                            AnimationSpeed = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x32, 0x02)),
+                            LastModification = BinaryPrimitives.ReadInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x28, 0x04)),
+                            ImageDataOffset = BinaryPrimitives.ReadInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x2C, 0x04)),
+                            Icons = IconGfxFormat.FromShort(BinaryPrimitives.ReadInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x30, 0x02))),
+                            AnimationSpeed = BinaryPrimitives.ReadInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x32, 0x02)),
                             FilePermissions = directoryRaw.AsSpan<byte>(entryOffset + 0x34, 0x01)[0],
                             CopyCounter = directoryRaw.AsSpan<byte>(entryOffset + 0x35, 0x01)[0],
-                            BlockNumber = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x36, 0x02)),
-                            BlockCount = BinaryPrimitives.ReadUInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x38, 0x02)),
-                            CommentAddress = BinaryPrimitives.ReadUInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x3c, 0x04)),
+                            BlockNumber = BinaryPrimitives.ReadInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x36, 0x02)),
+                            BlockCount = BinaryPrimitives.ReadInt16BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x38, 0x02)),
+                            CommentAddress = BinaryPrimitives.ReadInt32BigEndian(directoryRaw.AsSpan<byte>(entryOffset + 0x3c, 0x04)),
                         });
                     }                    
 

@@ -13,19 +13,19 @@ namespace GC_MemoryCard_Reader.MemoryCard
     /// </summary>
     internal class DirectoryEntry
     {
-        public uint GameCode { get; internal set; }
-        public ushort MakerCode { get; internal set; }
+        public string GameCode { get; internal set; }
+        public short MakerCode { get; internal set; }
         public BannerGfxFormat Banner {  get; internal set; }
         public string FileName { get; internal set; } = "";
-        public uint LastModification { get; internal set; }
-        public uint ImageDataOffset { get;internal set; }
-        public ushort IconFormat { get; internal set; }
-        public ushort AnimationSpeed { get; internal set; }
+        public int LastModification { get; internal set; }
+        public int ImageDataOffset { get;internal set; }
+        public ICollection<IconGfxFormat> Icons { get; internal set; } = new List<IconGfxFormat>(8);
+        public short AnimationSpeed { get; internal set; }
         public byte FilePermissions { get; internal set; }
         public byte CopyCounter { get; internal set; }
-        public ushort BlockNumber { get; internal set; }
-        public ushort BlockCount { get; internal set;}
-        public uint CommentAddress { get; internal set; }
+        public short BlockNumber { get; internal set; }
+        public short BlockCount { get; internal set;}
+        public int CommentAddress { get; internal set; }
 
         public override string ToString()
         {
@@ -37,7 +37,9 @@ namespace GC_MemoryCard_Reader.MemoryCard
             sb.AppendLine($"\tFileName: {FileName}");
             sb.AppendLine($"\tLastModification: {LastModification}");
             sb.AppendLine($"\tImageDataOffset: {ImageDataOffset}");
-            sb.AppendLine($"\tIconFormat: {IconFormat}");
+            sb.AppendLine($"\tIcons: {Icons.Count} detected");
+            foreach (IconGfxFormat icon in Icons)
+                sb.AppendLine($"\t\t{icon.Type}");
             sb.AppendLine($"\tAnimationSpeed: {AnimationSpeed}");
             sb.AppendLine($"\tFilePermissions: {Convert.ToString(FilePermissions).PadLeft(8, '0')}");
             sb.AppendLine($"\tCopyCounter: {CopyCounter}");

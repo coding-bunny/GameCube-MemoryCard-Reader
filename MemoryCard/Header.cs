@@ -10,11 +10,13 @@ namespace GC_MemoryCard_Reader.MemoryCard
     {
         public ulong TimeSpan { get; set; }
         public string CardId { get; set; } = "";
-        public ushort Size { get; set; }
-        public ushort Encoding { get; set; }
-        public ushort UpdateCounter { get; set; }
-        public ushort CheckSumOne { get; set; }
-        public ushort CheckSumTwo { get; set; }
+        public short Size { get; set; }
+        public short Encoding { get; set; }
+        public short UpdateCounter { get; set; }
+        public short CheckSumOne { get; set; }
+        public short CheckSumTwo { get; set; }
+
+        private DateTime GameCubeEpoch = new DateTime(2000, 1, 1, 12, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
         /// Returns a detailed <see cref="string"/> representation of the MemoryCard Header.
@@ -24,7 +26,7 @@ namespace GC_MemoryCard_Reader.MemoryCard
         {
             StringBuilder stringBuilder = new();
 
-            stringBuilder.AppendLine($"TimeSpan: {TimeSpan}");
+            stringBuilder.AppendLine($"TimeSpan: {SystemTime():dd/MMM, yyyy HH:mm:ss}");
             stringBuilder.AppendLine($"CardId: {CardId}");
             stringBuilder.AppendLine($"Size (Mbits): {Size}");
             stringBuilder.AppendLine($"Encoding: {Encoding}");
@@ -33,6 +35,13 @@ namespace GC_MemoryCard_Reader.MemoryCard
             stringBuilder.AppendLine($"CheckSumTwo: {CheckSumTwo}");
 
             return stringBuilder.ToString();
+        }
+
+        private DateTime SystemTime()
+        {
+            // TODO: Determine the card type somehow.
+            // A GameCube has a different CPU count than a Wii for example, resulting in different values.
+            return GameCubeEpoch.AddSeconds((TimeSpan & 0xFFFF0000) / 12);
         }
     }
 }
